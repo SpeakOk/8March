@@ -64,7 +64,7 @@ h1{
     left:50%;
     transform:translate(-50%,-50%);
     width:70px;
-    height:50px;
+    height:70px;
     background:white;
     border-radius:50%;
     display:flex;
@@ -73,8 +73,8 @@ h1{
     z-index:5;
 }
 .center-logo img{
-    width:99px;
-    height:99px;
+    width:90%;
+    height:90%;
     object-fit:contain;
 }
 .pointer{
@@ -112,6 +112,69 @@ button:hover{transform:scale(1.1)}
 #result.show{
     opacity:1;
     transform:scale(1.2);
+}
+
+/* 📱 Планшети */
+@media (max-width:768px){
+.wheel-wrapper{
+    width:320px;
+    height:320px;
+}
+h1{
+    font-size:22px;
+}
+button{
+    padding:12px 28px;
+    font-size:16px;
+}
+.pointer{
+    border-left:18px solid transparent;
+    border-right:18px solid transparent;
+    border-top:38px solid white;
+}
+}
+
+/* 📱 Телефони */
+@media (max-width:480px){
+.wheel-wrapper{
+    width:260px;
+    height:260px;
+    margin:25px auto;
+}
+h1{
+    font-size:18px;
+}
+button{
+    padding:10px 22px;
+    font-size:15px;
+}
+.center-logo{
+    width:55px;
+    height:55px;
+}
+.pointer{
+    border-left:15px solid transparent;
+    border-right:15px solid transparent;
+    border-top:32px solid white;
+}
+#result{
+    font-size:18px;
+}
+}
+
+/* 📱 Дуже маленькі телефони */
+@media (max-width:350px){
+.wheel-wrapper{
+    width:220px;
+    height:220px;
+}
+h1{
+    font-size:16px;
+}
+button{
+    font-size:14px;
+    padding:8px 18px;
+}
 }
 </style>
 </head>
@@ -257,3 +320,4 @@ window.addEventListener("mousemove",()=>{
 
 </body>
 </html>
+

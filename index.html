@@ -13,39 +13,41 @@ body{
     text-align:center;
     overflow:hidden;
 }
+
+/* падаючі квіти */
 .roses{
     position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    inset:0;
     pointer-events:none;
     z-index:1;
-    overflow:hidden;
 }
 .rose{
     position:absolute;
     top:-100px;
-    width:60px;
-    animation: fall linear forwards;
+    animation:fall linear forwards;
 }
 @keyframes fall{
     to{
         transform:translateY(110vh) rotate(720deg);
-        opacity:0.9;
+        opacity:.9;
     }
 }
+
 h1{
-    margin-top:20px;
+    margin-top:15px;
     color:white;
     text-shadow:0 0 15px #c084fc;
 }
+
+/* контейнер колеса */
 .wheel-wrapper{
     position:relative;
-    width:420px;
-    height:420px;
-    margin:40px auto;
+    width:min(90vw,520px);
+    height:min(90vw,520px);
+    margin:25px auto;
 }
+
+/* колесо */
 #wheel{
     width:100%;
     height:100%;
@@ -53,11 +55,11 @@ h1{
     box-shadow:
         0 0 40px #c084fc,
         0 0 80px #f472b6,
-        inset 0 0 40px rgba(255,255,255,0.6);
+        inset 0 0 40px rgba(255,255,255,.6);
     transition: transform 5s cubic-bezier(.17,.67,.12,.99);
-    position:relative;
-    z-index:2;
 }
+
+/* центр */
 .center-logo{
     position:absolute;
     top:50%;
@@ -73,10 +75,12 @@ h1{
     z-index:5;
 }
 .center-logo img{
-    width:90%;
-    height:90%;
+    width:85%;
+    height:85%;
     object-fit:contain;
 }
+
+/* стрілка */
 .pointer{
     position:absolute;
     top:-15px;
@@ -88,6 +92,8 @@ h1{
     filter:drop-shadow(0 0 10px white);
     z-index:10;
 }
+
+/* кнопка */
 button{
     padding:15px 35px;
     font-size:18px;
@@ -100,8 +106,10 @@ button{
     transition:.3s;
 }
 button:hover{transform:scale(1.1)}
+
+/* результат */
 #result{
-    margin-top:25px;
+    margin-top:20px;
     font-size:24px;
     font-weight:bold;
     color:white;
@@ -114,75 +122,25 @@ button:hover{transform:scale(1.1)}
     transform:scale(1.2);
 }
 
-/* 📱 Планшети */
-@media (max-width:768px){
-.wheel-wrapper{
-    width:320px;
-    height:320px;
-}
-h1{
-    font-size:22px;
-}
-button{
-    padding:12px 28px;
-    font-size:16px;
-}
+/* телефон */
+@media(max-width:500px){
+h1{font-size:20px}
+button{font-size:16px;padding:12px 25px}
+.center-logo{width:60px;height:60px}
 .pointer{
     border-left:18px solid transparent;
     border-right:18px solid transparent;
     border-top:38px solid white;
 }
-}
-
-/* 📱 Телефони */
-@media (max-width:480px){
-.wheel-wrapper{
-    width:260px;
-    height:260px;
-    margin:25px auto;
-}
-h1{
-    font-size:18px;
-}
-button{
-    padding:10px 22px;
-    font-size:15px;
-}
-.center-logo{
-    width:55px;
-    height:55px;
-}
-.pointer{
-    border-left:15px solid transparent;
-    border-right:15px solid transparent;
-    border-top:32px solid white;
-}
-#result{
-    font-size:18px;
-}
-}
-
-/* 📱 Дуже маленькі телефони */
-@media (max-width:350px){
-.wheel-wrapper{
-    width:220px;
-    height:220px;
-}
-h1{
-    font-size:16px;
-}
-button{
-    font-size:14px;
-    padding:8px 18px;
-}
+#result{font-size:18px}
 }
 </style>
 </head>
 
 <body>
-<audio id="bgMusic" autoplay muted loop>
 
-    <source src="music.mp3" type="audio/mpeg">
+<audio id="bgMusic" autoplay muted loop>
+<source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <div class="roses"></div>
@@ -194,7 +152,7 @@ button{
 <canvas id="wheel"></canvas>
 
 <div class="center-logo">
-<img src="logo.png"> 
+<img src="logo.png">
 </div>
 </div>
 
@@ -204,25 +162,35 @@ button{
 <script>
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
-canvas.width=420;
-canvas.height=420;
 
+/* адаптивний розмір canvas */
+function resizeCanvas(){
+const size=canvas.offsetWidth;
+canvas.width=size;
+canvas.height=size;
+drawWheel();
+}
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
+
+/* призи */
 const prizes=[
 "День без турбот",
 "100% весняний настрій",
 "День без прибирання",
-"Їм усе, що заманеться",
+"Їм усе що хочу",
 "Працюю не я",
-"«Кухня 24/7» сьогодні не працює",
-"Роблю те, що я хочу",
-"Спробую відпочити ще і завтра",
-"Увімкну режим «Богиня»",
-"Відпочиваю до 00:00 9-го березня"
+"Кухня сьогодні вихідна",
+"Роблю що хочу",
+"Відпочиваю ще завтра",
+"Режим Богиня",
+"Відпочинок до 00:00"
 ];
 
-const slices=prizes.length;
-const angle=2*Math.PI/slices;
+let slices=prizes.length;
+let angle;
 
+/* перенос рядків */
 function wrap(text,x,y,maxWidth,lineHeight){
 let words=text.split(" ");
 let line="";
@@ -237,28 +205,38 @@ y+=lineHeight;
 ctx.fillText(line,x,y);
 }
 
+/* малювання колеса */
 function drawWheel(){
+slices=prizes.length;
+angle=2*Math.PI/slices;
+
+const size=canvas.width;
+const center=size/2;
+const radius=size/2;
+
 const colors=["#c084fc","#f472b6","#a78bfa","#e879f9","#f0abfc","#d946ef","#9333ea","#ec4899","#8b5cf6","#db2777"];
-ctx.clearRect(0,0,420,420);
+
+ctx.clearRect(0,0,size,size);
+
 for(let i=0;i<slices;i++){
 ctx.beginPath();
-ctx.fillStyle=colors[i];
-ctx.moveTo(210,210);
-ctx.arc(210,210,210,i*angle,(i+1)*angle);
+ctx.fillStyle=colors[i%colors.length];
+ctx.moveTo(center,center);
+ctx.arc(center,center,radius,i*angle,(i+1)*angle);
 ctx.fill();
 
 ctx.save();
-ctx.translate(210,210);
+ctx.translate(center,center);
 ctx.rotate(i*angle+angle/2);
 ctx.textAlign="center";
 ctx.fillStyle="white";
-ctx.font="bold 14px sans-serif";
-wrap(prizes[i],130,0,170,16);
+ctx.font=`bold ${radius*0.08}px sans-serif`;
+wrap(prizes[i],radius*0.65,0,radius*0.8,radius*0.12);
 ctx.restore();
 }
 }
-drawWheel();
 
+/* обертання */
 let rotation=0;
 let spinning=false;
 
@@ -271,53 +249,47 @@ const result=document.getElementById("result");
 result.classList.remove("show");
 result.textContent="";
 
-const spinDeg = 360 * 6 + Math.floor(Math.random()*360);
-rotation += spinDeg;
-
-canvas.style.transform = `rotate(${rotation}deg)`;
+const spinDeg=360*6+Math.floor(Math.random()*360);
+rotation+=spinDeg;
+canvas.style.transform=`rotate(${rotation}deg)`;
 
 setTimeout(()=>{
-let actualDeg = rotation % 360;
-let pointerDeg = 270;
-let finalDeg = (pointerDeg - actualDeg + 360) % 360;
-let sliceDeg = 360 / slices;
-let index = Math.floor(finalDeg / sliceDeg);
+let actualDeg=rotation%360;
+let pointerDeg=270;
+let finalDeg=(pointerDeg-actualDeg+360)%360;
+let sliceDeg=360/slices;
+let index=Math.floor(finalDeg/sliceDeg);
 
-result.textContent = prizes[index];
+result.textContent=prizes[index];
 result.classList.add("show");
 spinning=false;
 },5000);
 }
 
-const rosesContainer = document.querySelector(".roses");
+/* квіти */
+const rosesContainer=document.querySelector(".roses");
 const roseImages=["rose1.png","rose2.png","rose3.png"];
 
 function createRose(){
 const rose=document.createElement("img");
-rose.classList.add("rose");
+rose.className="rose";
 rose.src=roseImages[Math.floor(Math.random()*roseImages.length)];
 rose.style.left=Math.random()*100+"vw";
-rose.style.animationDuration=(5+Math.random()*4)+"s";
-rose.style.width=(40+Math.random()*40)+"px";
+rose.style.width=(30+Math.random()*40)+"px";
+rose.style.animationDuration=(5+Math.random()*5)+"s";
 rosesContainer.appendChild(rose);
-setTimeout(()=>{rose.remove();},9000);
+setTimeout(()=>rose.remove(),9000);
 }
 setInterval(createRose,400);
 
-/* правильний запуск музики */
+/* запуск музики */
 function playMusic(){
-const music=document.getElementById("bgMusic");
-music.play().catch(()=>{});
+const m=document.getElementById("bgMusic");
+m.muted=false;
+m.play().catch(()=>{});
 }
-
-window.addEventListener("mousemove",()=>{
- const m=document.getElementById("bgMusic");
- m.muted=false;
-},{once:true});
-
-
+window.addEventListener("click",playMusic,{once:true});
 </script>
 
 </body>
 </html>
-

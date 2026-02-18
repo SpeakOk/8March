@@ -14,7 +14,7 @@ body{
     overflow:hidden;
 }
 
-/* падаючі квіти */
+/* падаючі троянди */
 .roses{
     position:fixed;
     inset:0;
@@ -24,6 +24,7 @@ body{
 .rose{
     position:absolute;
     top:-100px;
+    width:60px;
     animation:fall linear forwards;
 }
 @keyframes fall{
@@ -33,8 +34,9 @@ body{
     }
 }
 
+/* заголовок */
 h1{
-    margin-top:15px;
+    margin-top:20px;
     color:white;
     text-shadow:0 0 15px #c084fc;
 }
@@ -42,9 +44,11 @@ h1{
 /* контейнер колеса */
 .wheel-wrapper{
     position:relative;
-    width:min(90vw,520px);
-    height:min(90vw,520px);
-    margin:25px auto;
+    width:420px;
+    height:420px;
+    max-width:92vw;
+    max-height:92vw;
+    margin:40px auto;
 }
 
 /* колесо */
@@ -103,9 +107,10 @@ button{
     color:#7e22ce;
     cursor:pointer;
     font-weight:bold;
-    transition:.3s;
 }
-button:hover{transform:scale(1.1)}
+button:hover{
+    transform:scale(1.08);
+}
 
 /* результат */
 #result{
@@ -122,16 +127,23 @@ button:hover{transform:scale(1.1)}
     transform:scale(1.2);
 }
 
-/* телефон */
-@media(max-width:500px){
-h1{font-size:20px}
-button{font-size:16px;padding:12px 25px}
-.center-logo{width:60px;height:60px}
+/* адаптив */
+@media(max-width:480px){
+.wheel-wrapper{
+    width:300px;
+    height:300px;
+}
 .pointer{
     border-left:18px solid transparent;
     border-right:18px solid transparent;
     border-top:38px solid white;
 }
+.center-logo{
+    width:55px;
+    height:55px;
+}
+h1{font-size:20px}
+button{font-size:16px;padding:12px 24px}
 #result{font-size:18px}
 }
 </style>
@@ -139,7 +151,7 @@ button{font-size:16px;padding:12px 25px}
 
 <body>
 
-<audio id="bgMusic" autoplay muted loop>
+<audio id="bgMusic" loop>
 <source src="music.mp3" type="audio/mpeg">
 </audio>
 
@@ -149,7 +161,7 @@ button{font-size:16px;padding:12px 25px}
 
 <div class="wheel-wrapper">
 <div class="pointer"></div>
-<canvas id="wheel"></canvas>
+<canvas id="wheel" width="420" height="420"></canvas>
 
 <div class="center-logo">
 <img src="logo.png">
@@ -163,34 +175,24 @@ button{font-size:16px;padding:12px 25px}
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-/* адаптивний розмір canvas */
-function resizeCanvas(){
-const size=canvas.offsetWidth;
-canvas.width=size;
-canvas.height=size;
-drawWheel();
-}
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
-
 /* призи */
 const prizes=[
 "День без турбот",
-"100% весняний настрій",
+"Весняний настрій",
 "День без прибирання",
-"Їм усе що хочу",
+"Їм що хочу",
 "Працюю не я",
-"Кухня сьогодні вихідна",
+"Кухня вихідна",
 "Роблю що хочу",
-"Відпочиваю ще завтра",
+"Відпочиваю завтра",
 "Режим Богиня",
 "Відпочинок до 00:00"
 ];
 
-let slices=prizes.length;
-let angle;
+const slices=prizes.length;
+const angle=2*Math.PI/slices;
 
-/* перенос рядків */
+/* перенос тексту */
 function wrap(text,x,y,maxWidth,lineHeight){
 let words=text.split(" ");
 let line="";
@@ -205,36 +207,30 @@ y+=lineHeight;
 ctx.fillText(line,x,y);
 }
 
-/* малювання колеса */
+/* малювання */
 function drawWheel(){
-slices=prizes.length;
-angle=2*Math.PI/slices;
-
-const size=canvas.width;
-const center=size/2;
-const radius=size/2;
-
 const colors=["#c084fc","#f472b6","#a78bfa","#e879f9","#f0abfc","#d946ef","#9333ea","#ec4899","#8b5cf6","#db2777"];
 
-ctx.clearRect(0,0,size,size);
+ctx.clearRect(0,0,420,420);
 
 for(let i=0;i<slices;i++){
 ctx.beginPath();
-ctx.fillStyle=colors[i%colors.length];
-ctx.moveTo(center,center);
-ctx.arc(center,center,radius,i*angle,(i+1)*angle);
+ctx.fillStyle=colors[i];
+ctx.moveTo(210,210);
+ctx.arc(210,210,210,i*angle,(i+1)*angle);
 ctx.fill();
 
 ctx.save();
-ctx.translate(center,center);
+ctx.translate(210,210);
 ctx.rotate(i*angle+angle/2);
 ctx.textAlign="center";
 ctx.fillStyle="white";
-ctx.font=`bold ${radius*0.08}px sans-serif`;
-wrap(prizes[i],radius*0.65,0,radius*0.8,radius*0.12);
+ctx.font="bold 16px sans-serif";
+wrap(prizes[i],130,0,170,18);
 ctx.restore();
 }
 }
+drawWheel();
 
 /* обертання */
 let rotation=0;
@@ -251,6 +247,7 @@ result.textContent="";
 
 const spinDeg=360*6+Math.floor(Math.random()*360);
 rotation+=spinDeg;
+
 canvas.style.transform=`rotate(${rotation}deg)`;
 
 setTimeout(()=>{
@@ -266,7 +263,7 @@ spinning=false;
 },5000);
 }
 
-/* квіти */
+/* троянди */
 const rosesContainer=document.querySelector(".roses");
 const roseImages=["rose1.png","rose2.png","rose3.png"];
 
@@ -275,17 +272,16 @@ const rose=document.createElement("img");
 rose.className="rose";
 rose.src=roseImages[Math.floor(Math.random()*roseImages.length)];
 rose.style.left=Math.random()*100+"vw";
-rose.style.width=(30+Math.random()*40)+"px";
-rose.style.animationDuration=(5+Math.random()*5)+"s";
+rose.style.animationDuration=(5+Math.random()*4)+"s";
+rose.style.width=(40+Math.random()*40)+"px";
 rosesContainer.appendChild(rose);
 setTimeout(()=>rose.remove(),9000);
 }
 setInterval(createRose,400);
 
-/* запуск музики */
+/* музика після кліку */
 function playMusic(){
 const m=document.getElementById("bgMusic");
-m.muted=false;
 m.play().catch(()=>{});
 }
 window.addEventListener("click",playMusic,{once:true});
